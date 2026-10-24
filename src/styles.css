@@ -1,12 +1,13 @@
 :root {
-  --bg: #080a0f;
-  --hud-bg: rgba(12, 15, 22, 0.78);
-  --hud-border: rgba(212, 175, 55, 0.36);
-  --gold: #d4af37;
-  --gold-bright: #f5d76e;
-  --text: #f0ece1;
-  --muted: #9aa0a6;
-  --accent-blue: #4ea8de;
+  --bg: #9bd8ff;
+  --hud-bg: rgba(43, 29, 18, 0.82);
+  --hud-border: rgba(224, 185, 104, 0.45);
+  --gold: #f2c975;
+  --gold-bright: #ffe28a;
+  --text: #fbf7ee;
+  --muted: #d5c8b8;
+  --accent-blue: #38bdf8;
+  --terracotta: #c85a38;
   --danger: #e63946;
 }
 
@@ -357,7 +358,7 @@ body.cinematic-ui-hidden #hud-bottom {
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: radial-gradient(circle at center, #111622 0%, #06080d 100%);
+  background: radial-gradient(circle at center, #3d2716 0%, #1e130a 100%);
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -2,6 +2,7 @@ import * as THREE_NS from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { createPixarRoomEnvironment } from './pixarRoomEnvironment.js';
 
 /** @type {any} */
 const THREE = THREE_NS;
@@ -57,15 +58,15 @@ export function initWizardChess() {
     container.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x070a12);
-    scene.fog = new THREE.FogExp2(0x080b14, 0.015);
+    scene.background = new THREE.Color(0x9bd8ff);
+    scene.fog = new THREE.Fog(0xbde7ff, 28, 75);
 
-    // Self-contained Cathedral PMREM Environment (inspired by three-gpu-pathtracer & realism-effects)
-    function createCathedralPMREMEnvironment(glRenderer) {
+    // Warm Pixar Daytime PMREM Studio Environment
+    function createPixarDaylightPMREMEnvironment(glRenderer) {
       const pmremGen = new THREE.PMREMGenerator(glRenderer);
       pmremGen.compileEquirectangularShader();
       const envScene = new THREE.Scene();
-      envScene.background = new THREE.Color(0x161412);
+      envScene.background = new THREE.Color(0xb2e2ff);
       const boxGeo = new THREE.BoxGeometry(1, 1, 1);
       const addPanel = (colorHex, intensity, pos, scl) => {
         const mat = new THREE.MeshBasicMaterial({
@@ -76,37 +77,35 @@ export function initWizardChess() {
         m.scale.fromArray(scl);
         envScene.add(m);
       };
-      // Upper Gothic clerestory & Rose Window light panels
-      addPanel(0xdce6f7, 2.4, [0, 9.5, -12.0], [10.0, 2.0, 1.5]);
-      addPanel(0xffe0b5, 2.2, [0, 9.5, 12.0], [10.0, 2.0, 1.5]);
-      addPanel(0xd4deee, 1.8, [-9.0, 6.5, 0.0], [1.2, 4.5, 16.0]);
-      addPanel(0xd4deee, 1.8, [9.0, 6.5, 0.0], [1.2, 4.5, 16.0]);
-      // Warm twin fire cauldron & limestone floor bounce panels
-      addPanel(0xff9438, 3.2, [-4.5, 1.6, 0.0], [2.2, 2.2, 4.0]);
-      addPanel(0xff9438, 3.2, [4.5, 1.6, 0.0], [2.2, 2.2, 4.0]);
-      addPanel(0x6e5c49, 0.9, [0, -4.0, 0.0], [16.0, 1.0, 24.0]);
+      // Warm sun bounce panel
+      addPanel(0xfffaea, 3.4, [6.0, 14.0, -8.0], [6.0, 6.0, 2.0]);
+      // Pale blue sky hemisphere bounce
+      addPanel(0x90caf9, 1.6, [0, 10.0, 0], [20.0, 2.0, 20.0]);
+      // Warm indoor wood & terracotta floor bounce
+      addPanel(0xca8b52, 1.2, [0, -4.0, 2.0], [14.0, 1.0, 14.0]);
+      addPanel(0xbf5d3b, 1.1, [0, -4.0, -8.0], [18.0, 1.0, 16.0]);
       const envTex = pmremGen.fromScene(envScene, 0.04).texture;
       boxGeo.dispose();
       pmremGen.dispose();
       return envTex;
     }
 
-    scene.environment = createCathedralPMREMEnvironment(renderer);
+    scene.environment = createPixarDaylightPMREMEnvironment(renderer);
     if ('environmentIntensity' in scene) {
-      scene.environmentIntensity = 0.24;
+      scene.environmentIntensity = 0.85;
     }
 
     const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.22, 65);
-    camera.position.set(0, 2.22, 2.72);
+    camera.position.set(0, 2.36, 2.68);
 
     const orbitControls = new OrbitControls(camera, renderer.domElement);
     orbitControls.enableDamping = true;
     orbitControls.dampingFactor = 0.16;
-    orbitControls.maxPolarAngle = Math.PI * 0.88;
-    orbitControls.minPolarAngle = 0.05;
-    orbitControls.minDistance = 0.95;
-    orbitControls.maxDistance = 36.0;
-    orbitControls.target.set(0, 0.85, -0.15);
+    orbitControls.maxPolarAngle = Math.PI * 0.48;
+    orbitControls.minPolarAngle = 0.04;
+    orbitControls.minDistance = 1.15;
+    orbitControls.maxDistance = 8.50;
+    orbitControls.target.set(0, 0.78, 0.02);
     orbitControls.update();
 
     // =========================================================================
@@ -208,18 +207,18 @@ export function initWizardChess() {
       return origHandleMouseMovePan(event);
     };
 
-    // Dramatic Chiaroscuro Cathedral & Board Lighting (restoring original-example 3D stone relief & warm firelight contrast)
-    const hemiLight = new THREE.HemisphereLight(0xd8ccb8, 0x261d14, 0.62);
+    // Warm Sunbeam & Cozy Living Room Pixar Lighting Rig
+    const hemiLight = new THREE.HemisphereLight(0xbde7ff, 0x8f6542, 1.25);
     scene.add(hemiLight);
 
-    const keyLight = new THREE.DirectionalLight(0xfff0d6, 2.55);
-    keyLight.position.set(3.8, 8.5, 4.2);
+    const keyLight = new THREE.DirectionalLight(0xfff5dc, 2.85);
+    keyLight.position.set(4.5, 9.5, -6.8);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 2048;
     keyLight.shadow.mapSize.height = 2048;
     keyLight.shadow.camera.near = 1.0;
-    keyLight.shadow.camera.far = 22.0;
-    const d = 3.2;
+    keyLight.shadow.camera.far = 30.0;
+    const d = 4.8;
     keyLight.shadow.camera.left = -d;
     keyLight.shadow.camera.right = d;
     keyLight.shadow.camera.top = d;
@@ -227,30 +226,21 @@ export function initWizardChess() {
     keyLight.shadow.bias = -0.0005;
     scene.add(keyLight);
 
-    // Subtle directional rim/fill (kept low so opposing directional lights never cancel normal-map mortar shadows)
-    const rimLight = new THREE.DirectionalLight(0xd8cbb8, 0.72);
-    rimLight.position.set(-4.5, 6.0, -6.5);
+    // Warm indoor living room ceiling fill
+    const roomWarmFill = new THREE.PointLight(0xffecd1, 1.8, 14.0, 1.2);
+    roomWarmFill.position.set(0, 3.6, 2.2);
+    scene.add(roomWarmFill);
+
+    // Cool sky fill from the open courtyard
+    const rimLight = new THREE.DirectionalLight(0xbadcfa, 0.95);
+    rimLight.position.set(-5.5, 6.0, -8.0);
     scene.add(rimLight);
 
-    const southFillLight = new THREE.DirectionalLight(0xffe4c0, 0.52);
-    southFillLight.position.set(4.2, 5.8, 7.5);
+    const southFillLight = new THREE.DirectionalLight(0xffecd1, 0.65);
+    southFillLight.position.set(3.2, 5.0, 6.5);
     scene.add(southFillLight);
 
-    // Twin Flickering Brazier Point Lights (centered at x = +/-3.65, z = 0.00; flanking column bounce is evaluated in shader)
-    const brazierCoords = [
-      { pos: [-3.65, 1.08, 0.00], baseIntensity: 4.35, dist: 18.0 },
-      { pos: [3.65, 1.08, 0.00], baseIntensity: 4.35, dist: 18.0 }
-    ];
     const brazierLights = [];
-    for (const cfg of brazierCoords) {
-      const pLight = new THREE.PointLight(0xff8e32, cfg.baseIntensity, cfg.dist, 1.40);
-      pLight.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
-      pLight.userData.baseIntensity = cfg.baseIntensity;
-      scene.add(pLight);
-      brazierLights.push(pLight);
-    }
-
-    // Realistic Gaseous GLSL Brazier Flames & Soft Warm Firelight Glow (zero bouncing shapes)
     const brazierFireUniforms = [];
     const brazierGlowSprites = [];
 
@@ -314,40 +304,24 @@ export function initWizardChess() {
     // & Solid Cylindrical Column Collision / Circumferential Sliding Solver
     // =========================================================================
     const CATHEDRAL_BOUNDS = {
-      minX: -6.65,
-      maxX: 6.65,
-      minY: 0.34,
-      maxY: 8.85,
-      minZ: -18.10,
-      maxZ: 18.10
+      minX: -6.40,
+      maxX: 6.40,
+      minY: 0.35,
+      maxY: 8.50,
+      minZ: -14.00,
+      maxZ: 7.20
     };
 
-    // 12 freestanding columns spread wider across the nave; the 4 columns closest to the chessboard (z = +/-2.20)
-    // have been removed to create a grand 13.70m open Atrium around the altar and centered fire braziers
-    const CATHEDRAL_COLUMN_ROWS = [
-      { z: -16.65, xAbs: 4.25 },
-      { z: -11.85, xAbs: 4.25 },
-      { z: -6.85,  xAbs: 4.65 },
-      { z: 6.85,   xAbs: 4.65 },
-      { z: 11.85,  xAbs: 4.25 },
-      { z: 16.65,  xAbs: 4.25 }
-    ];
     const CATHEDRAL_SOLID_PILLARS = [
-      ...CATHEDRAL_COLUMN_ROWS.flatMap(({ z, xAbs }) => [
-        { x: -xAbs, z, r: 0.86, maxY: 9.65, isColumn: true },
-        { x: xAbs,  z, r: 0.86, maxY: 9.65, isColumn: true }
-      ]),
-      { x: -3.65, z: 0.00, r: 0.68, maxY: 1.95, isColumn: false },
-      { x: 3.65,  z: 0.00, r: 0.68, maxY: 1.95, isColumn: false }
+      { x: -4.60, z: -2.60, r: 0.35, maxY: 4.60, isColumn: true },
+      { x: 4.60,  z: -2.60, r: 0.35, maxY: 4.60, isColumn: true }
     ];
 
     function clampPointToCathedralRoom(pt, isTarget = false) {
       const margin = isTarget ? 0.15 : 0.0;
       pt.x = Math.max(CATHEDRAL_BOUNDS.minX - margin, Math.min(CATHEDRAL_BOUNDS.maxX + margin, pt.x));
       pt.z = Math.max(CATHEDRAL_BOUNDS.minZ - margin, Math.min(CATHEDRAL_BOUNDS.maxZ + margin, pt.z));
-      // Account for the sloped side-aisle ceiling vault outside x = +/-4.15
-      const aisleDrop = Math.max(0, Math.abs(pt.x) - 4.15) * 0.55;
-      const localMaxY = Math.min(CATHEDRAL_BOUNDS.maxY, 9.05 - aisleDrop);
+      const localMaxY = CATHEDRAL_BOUNDS.maxY;
       const localMinY = isTarget ? 0.20 : CATHEDRAL_BOUNDS.minY;
       pt.y = Math.max(localMinY, Math.min(localMaxY, pt.y));
     }
@@ -426,44 +400,22 @@ export function initWizardChess() {
         }
       }
 
-      // Solid Black Marble Altar (4.40m x 4.20m slab + pedestal) & Chessboard collision
-      // Prevents the camera from passing down through either the chessboard OR the surrounding black marble altar rim
-      const ALTAR_TOP_Y = 0.722;
-      const ALTAR_HALF_X = 2.48; // 2.22m black marble slab half-width + 0.26m camera frustum near-clip margin
-      const ALTAR_HALF_Z = 2.38; // 2.12m black marble slab half-depth + 0.26m camera frustum near-clip margin
+      // Handcrafted Wooden Dining Table (holds the chessboard at BOARD_SURFACE_Y = 0.775)
+      const TABLE_TOP_Y = 0.738;
+      const TABLE_HALF_X = 1.35;
+      const TABLE_HALF_Z = 1.30;
       const BOARD_HALF_XZ = 1.66;
-      if (Math.abs(targetPos.x) < 2.36 && Math.abs(targetPos.z) < 2.26) {
-        const minTargetY =
-          Math.abs(targetPos.x) < 1.56 && Math.abs(targetPos.z) < 1.56
-            ? BOARD_SURFACE_Y + 0.05
-            : ALTAR_TOP_Y + 0.05;
+      if (Math.abs(targetPos.x) < 1.45 && Math.abs(targetPos.z) < 1.45) {
+        const minTargetY = BOARD_SURFACE_Y + 0.05;
         if (targetPos.y < minTargetY) {
           targetPos.y = minTargetY;
         }
       }
-      if (Math.abs(x1) < ALTAR_HALF_X && Math.abs(z1) < ALTAR_HALF_Z) {
+      if (Math.abs(x1) < TABLE_HALF_X && Math.abs(z1) < TABLE_HALF_Z) {
         const isOverChessboard = Math.abs(x1) < BOARD_HALF_XZ && Math.abs(z1) < BOARD_HALF_XZ;
-        const solidAltarTopY = isOverChessboard ? (BOARD_SURFACE_Y + 0.25) : (ALTAR_TOP_Y + 0.28); // 1.035m on board, 1.002m on black marble altar
-        if (curPos.y < solidAltarTopY) {
-          const wasInsideAltarFootprint =
-            Boolean(prevPos) &&
-            Math.abs(x0) < ALTAR_HALF_X - 0.005 &&
-            Math.abs(z0) < ALTAR_HALF_Z - 0.005;
-          const wasAboveAltarSlab =
-            wasInsideAltarFootprint ||
-            (Boolean(prevPos) && prevPos.y >= ALTAR_TOP_Y - 0.04) ||
-            curPos.y >= ALTAR_TOP_Y - 0.10;
-          if (wasAboveAltarSlab) {
-            curPos.y = Math.max(curPos.y, solidAltarTopY);
-          } else {
-            const penX = ALTAR_HALF_X - Math.abs(x1);
-            const penZ = ALTAR_HALF_Z - Math.abs(z1);
-            if (penX < penZ) {
-              x1 = (x1 >= 0 ? 1 : -1) * ALTAR_HALF_X;
-            } else {
-              z1 = (z1 >= 0 ? 1 : -1) * ALTAR_HALF_Z;
-            }
-          }
+        const solidTableTopY = isOverChessboard ? (BOARD_SURFACE_Y + 0.22) : (TABLE_TOP_Y + 0.24);
+        if (curPos.y < solidTableTopY) {
+          curPos.y = Math.max(curPos.y, solidTableTopY);
         }
       }
 
@@ -1155,6 +1107,8 @@ export function initWizardChess() {
       return setFloorStoneLook(0);
     }
 
+    let pixarEnv = null;
+
     async function loadAllAssets() {
       const loaderBar = document.getElementById('loader-bar');
       const loaderText = document.getElementById('loader-text');
@@ -1231,164 +1185,9 @@ export function initWizardChess() {
       });
       const charredEmberLogsShader = createCharredEmberLogsShader();
 
-      // 1. Load Native Full-Height Cathedral Environment (shifted by z = -0.65 so the Obsidian Altar is centered at 0, 0.7215, 0)
-      const maxAniso = renderer.capabilities.getMaxAnisotropy() || 8;
-      await new Promise((resolve) => {
-        loadGltfModel('option8_cathedral').then(
-          (gltf) => {
-            const cathedralRoot = gltf.scene;
-            cathedralRoot.position.set(0, 0, -0.65);
-
-            cathedralRoot.traverse((child) => {
-              if (!child.isMesh) return;
-              child.receiveShadow = true;
-              const meshName = child.name || '';
-              const mNameFirst = (Array.isArray(child.material) ? child.material[0]?.name : child.material?.name) || '';
-
-              if (meshName.includes('Brazier_Flame_Core') || mNameFirst.includes('Flame_Core')) {
-                child.material = flameCoreShader;
-                child.castShadow = false;
-                child.receiveShadow = false;
-                child.renderOrder = 12;
-                return;
-              }
-              if (meshName.includes('Brazier_Flame_Mid') || mNameFirst.includes('Flame_Mid')) {
-                stripIcosphereSparksFromFlameGeometry(child.geometry);
-                child.material = flameMidShader;
-                child.castShadow = false;
-                child.receiveShadow = false;
-                child.renderOrder = 11;
-                return;
-              }
-              if (meshName.includes('Brazier_Flame_Outer') || mNameFirst.includes('Flame_Outer')) {
-                child.material = flameOuterShader;
-                child.castShadow = false;
-                child.receiveShadow = false;
-                child.renderOrder = 10;
-                return;
-              }
-              if (meshName.includes('Embers_Logs') || mNameFirst.includes('Ember')) {
-                child.material = charredEmberLogsShader;
-                child.castShadow = false;
-                child.receiveShadow = false;
-                return;
-              }
-
-              // Only the central Obsidian Altar casts real-time directional shadows;
-              // cathedral columns/walls/ceiling and twin braziers use baked 3D Chiaroscuro & BVH ray-traced AO
-              // so they never project clipped or directional shadows across the floor.
-              const isShadowCasterProp =
-                meshName.includes('Obsidian_Altar') ||
-                meshName.includes('Altar_Golden_Runes');
-
-              const mats = Array.isArray(child.material) ? child.material : [child.material];
-              for (const mat of mats) {
-                if (!mat) continue;
-                const mName = mat.name || '';
-                const isAmberGlass =
-                  mName.includes('Amber') ||
-                  mName.includes('Narthex_Amber') ||
-                  meshName.includes('Narthex_Amber');
-                const isGlass =
-                  isAmberGlass ||
-                  mName.includes('Glass') ||
-                  mName.includes('Lancet') ||
-                  mName.includes('Rose') ||
-                  meshName.includes('Glass') ||
-                  meshName.includes('Window');
-                const isRay = mName.includes('GodRay') || meshName.includes('GodRay');
-
-                for (const texKey of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap']) {
-                  if (mat[texKey]) {
-                    mat[texKey].anisotropy = maxAniso;
-                    mat[texKey].needsUpdate = true;
-                  }
-                }
-
-                // Preserve native 1024x1024 GLB-baked textures before any look switching
-                if (!mat.userData.origCaptured) {
-                  mat.userData.origCaptured = true;
-                  mat.userData.origMap = mat.map || null;
-                  mat.userData.origNormalMap = mat.normalMap || null;
-                  mat.userData.origRoughnessMap = mat.roughnessMap || null;
-                  mat.userData.origEmissiveMap = mat.emissiveMap || null;
-                }
-
-                if (mat.normalMap && mat.normalScale) {
-                  const isDoorMat = mName.includes('Oak') || mName.includes('Door') || meshName.includes('Door');
-                  const nScale = isDoorMat ? 1.05 : 1.15;
-                  mat.normalScale.set(nScale, nScale);
-                }
-
-                if (isAmberGlass) {
-                  mat.vertexColors = false;
-                  mat.color = new THREE.Color(0xffe6b8);
-                  mat.emissive = new THREE.Color(0xffa033);
-                  mat.emissiveIntensity = 2.45;
-                  mat.roughness = 0.15;
-                  mat.metalness = 0.0;
-                  mat.side = THREE.DoubleSide;
-                  child.castShadow = false;
-                } else if (isGlass) {
-                  mat.vertexColors = false;
-                  mat.color = new THREE.Color(0xdbeeff);
-                  mat.emissive = new THREE.Color(0x68a8ff);
-                  mat.emissiveIntensity = 2.65;
-                  mat.roughness = 0.15;
-                  mat.metalness = 0.0;
-                  mat.side = THREE.DoubleSide;
-                  child.castShadow = false;
-                } else if (isRay) {
-                  child.visible = false;
-                  child.castShadow = false;
-                  child.receiveShadow = false;
-                } else {
-                  if (mat.map) {
-                    mat.vertexColors = true;
-                  }
-                  child.castShadow = isShadowCasterProp;
-
-                  // Register Wall, Column/Arch/Plinth, and Floor stone materials for live 6-look switching & Realism Shader
-                  if (mName.includes('Floor') || mName.includes('Flagstone') || meshName.includes('Floor')) {
-                    applyCathedralStoneRealismShader(mat, true);
-                    if (!cathedralFloorMats.includes(mat)) cathedralFloorMats.push(mat);
-                  } else if (
-                    mName.includes('Column_Stone') ||
-                    mName.includes('Tracery') ||
-                    meshName.includes('Plinth') ||
-                    meshName.includes('Tracery')
-                  ) {
-                    applyCathedralStoneRealismShader(mat, false);
-                    if (!cathedralColumnMats.includes(mat)) cathedralColumnMats.push(mat);
-                  } else if (
-                    mName.includes('Gothic_Ashlar') ||
-                    mName.includes('Ashlar') ||
-                    mName.includes('Vault') ||
-                    meshName.includes('Cathedral_Stone')
-                  ) {
-                    applyCathedralStoneRealismShader(mat, false);
-                    if (!cathedralWallMats.includes(mat)) cathedralWallMats.push(mat);
-                  }
-                }
-                mat.needsUpdate = true;
-              }
-            });
-
-            // Initialize default Look 1/6 (Original Ashlar & Abbey Flagstone) on Wall/Column Stone and Floor Stone
-            setWallStoneLook(0);
-            setFloorStoneLook(0);
-            scene.add(cathedralRoot);
-
-            bumpProgress('Cathedral Architecture Loaded...');
-            resolve();
-          },
-          (err) => {
-            console.warn('Cathedral GLB load warning:', err);
-            bumpProgress('Cathedral Loaded');
-            resolve();
-          }
-        );
-      });
+      // 1. Build Pixar 3D Living Room & Traditional Vietnamese Courtyard Environment
+      pixarEnv = createPixarRoomEnvironment(scene);
+      bumpProgress('Assembling Pixar 3D Living Room & Courtyard...');
 
       // 2. Load 6 Sculpted & Rigged Chess Piece Models (shared between White & Black with PBR materials)
       for (const type of PIECE_TYPES) {
@@ -1492,11 +1291,11 @@ export function initWizardChess() {
     }
 
     function setCameraForSide(color, immediate = false) {
-      // White sits at +Z looking toward -Z (across the Obsidian Altar down the Cathedral Nave & Rose Window)
-      // Black sits at -Z looking toward +Z (across the Obsidian Altar toward the South Narthex Royal Amber Triptych)
+      // White sits at +Z looking toward -Z across the wooden dining table and into the sunny courtyard
+      // Black sits at -Z looking toward +Z across the wooden dining table toward the living room
       const zSign = color === 'b' ? -1 : 1;
-      const desiredPos = new THREE.Vector3(0, 2.22, zSign * 2.72);
-      const desiredTarget = new THREE.Vector3(0, 0.85, zSign * -0.15);
+      const desiredPos = new THREE.Vector3(0, 2.36, zSign * 2.68);
+      const desiredTarget = new THREE.Vector3(0, 0.78, zSign * 0.02);
       if (immediate) {
         activeCamTransition = null;
         camera.position.copy(desiredPos);
@@ -4185,7 +3984,7 @@ export function initWizardChess() {
         }
         setActiveCamButton('btn-cam-top');
         const zSign = overheadCamSide === 'b' ? -1 : 1;
-        smoothCameraTo(new THREE.Vector3(0, 6.85, zSign * 3.65), new THREE.Vector3(0, 0.78, 0), 0.75);
+        smoothCameraTo(new THREE.Vector3(0, 4.60, zSign * 1.30), new THREE.Vector3(0, 0.78, 0), 0.75);
       } else if (preset === 'side') {
         const wasSideActive = document.getElementById('btn-cam-side')?.classList.contains('active');
         if (wasSideActive) {
@@ -4205,11 +4004,11 @@ export function initWizardChess() {
         }
         setActiveCamButton('btn-cam-wide');
         if (cathedralWideSide === 'south') {
-          // Black's wide Cathedral perspective looking South toward the Narthex Triptych (chessboard centered in frame)
-          smoothCameraTo(new THREE.Vector3(0, 2.55, -6.65), new THREE.Vector3(0, 1.95, 2.50), 0.85);
+          // Sunny Courtyard view looking into the warm wooden living room and chessboard
+          smoothCameraTo(new THREE.Vector3(0, 1.75, -5.85), new THREE.Vector3(0, 1.15, 0.40), 0.85);
         } else {
-          // White's wide Cathedral perspective looking North toward the Rose Window (chessboard centered in frame)
-          smoothCameraTo(new THREE.Vector3(0, 2.55, 6.65), new THREE.Vector3(0, 1.95, -2.50), 0.85);
+          // Cozy Wooden Room view looking through the open veranda out into the sunny courtyard, rooster, and bamboo
+          smoothCameraTo(new THREE.Vector3(0, 2.25, 4.60), new THREE.Vector3(0, 1.05, -3.20), 0.85);
         }
       } else if (preset === 'white_backdrop') {
         smoothCameraTo(new THREE.Vector3(0, 2.35, -3.10), new THREE.Vector3(0, 2.20, 8.50), 0.85);
@@ -4883,6 +4682,12 @@ export function initWizardChess() {
           const s = Math.max(0.01, d.life * 2);
           d.mesh.scale.setScalar((d.baseScale || 0.036) * s);
         }
+      }
+
+      // Animate Pixar 3D Living Room & Vietnamese Courtyard (Rooster walk/peck, Lanterns sway, Bamboo breeze)
+      if (pixarEnv && typeof pixarEnv.updateEnvironment === 'function') {
+        pixarEnv.updateEnvironment(dt, elapsedTotal);
+        renderer.shadowMap.needsUpdate = true;
       }
 
       // Advance volumetric GLSL brazier flames & active warm firelight flicker

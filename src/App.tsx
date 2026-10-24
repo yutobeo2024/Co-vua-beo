@@ -44,11 +44,11 @@ export default function App() {
   return (
     <>
       <div id="loading-overlay">
-        <div className="loader-title">Wizard Chess</div>
+        <div className="loader-title">BeoChess 3D</div>
         <div className="loader-bar-wrap">
           <div className="loader-bar" id="loader-bar"></div>
         </div>
-        <div id="loader-text">Summoning Sanctum Architecture &amp; Sculpted Pieces...</div>
+        <div id="loader-text">Đang tạo dựng căn phòng Pixar 3D &amp; Sân vườn làng quê...</div>
       </div>
 
       <div id="canvas-container"></div>
@@ -58,20 +58,20 @@ export default function App() {
         className="hud-btn mobile-only-restore-ui"
         id="btn-mobile-show-ui"
         onClick={handleRestoreUI}
-        title="Show HUD Controls"
+        title="Hiển thị bảng điều khiển"
       >
-        Show UI
+        Giao Diện
       </button>
 
       <div id="hud-top">
         <div className="hud-group" id="hud-left">
           <div className="brand-pill">
-            <span className="brand-title">Wizard Chess</span>
+            <span className="brand-title">BeoChess 3D</span>
           </div>
           <div className="status-pill" id="status-pill">
             <span className="turn-dot" id="turn-dot"></span>
-            <span id="turn-text">White to Move</span>
-            <span className="mode-badge" id="mode-badge">Playing as White</span>
+            <span id="turn-text">Lượt Trắng</span>
+            <span className="mode-badge" id="mode-badge">Đang chơi quân Trắng</span>
           </div>
         </div>
 
@@ -126,89 +126,89 @@ export default function App() {
             </button>
           </div>
 
-          <div className="mobile-sheet-section-label">Game Actions</div>
+          <div className="mobile-sheet-section-label">Thao Tác Trò Chơi</div>
 
           <button
             className="hud-btn"
             id="btn-side-toggle"
-            title="Switch between Playing as White and Playing as Black"
+            title="Đổi phe chơi giữa Trắng và Đen"
             onClick={() => setMobileSheetOpen(false)}
           >
-            Play as Black
+            Đổi Sang Quân Đen
           </button>
           <button
             className="hud-btn"
             id="btn-ai-move"
-            title="Let the AI make the next move immediately"
+            title="Để máy AI đi nước tiếp theo"
             onClick={() => setMobileSheetOpen(false)}
           >
-            AI Move
+            AI Đi Cờ
           </button>
           <button
             className="hud-btn"
             id="btn-reset"
-            title="Start a fresh game on the altar"
+            title="Bắt đầu ván cờ mới"
             onClick={() => setMobileSheetOpen(false)}
           >
-            New Game
+            Ván Mới
           </button>
 
           <div className="hud-divider" aria-hidden="true"></div>
           <div className="mobile-sheet-section-label">
-            <span>Camera Views</span>
-            <span className="mobile-sheet-section-sub">Tap active view to flip</span>
+            <span>Góc Nhìn Camera</span>
+            <span className="mobile-sheet-section-sub">Chạm lần nữa để đổi chiều</span>
           </div>
 
           <button
             className="hud-btn active"
             id="btn-cam-player"
-            title="Player Camera (Click again to flip White / Black view)"
+            title="Góc nhìn người chơi tại bàn"
           >
-            Player Cam
+            Góc Bàn Cờ
           </button>
           <button
             className="hud-btn"
             id="btn-cam-top"
-            title="Overhead Board View (Click again to flip White / Black orientation)"
+            title="Góc nhìn từ trên cao xuống"
           >
-            Overhead
+            Từ Trên Cao
           </button>
           <button
             className="hud-btn"
             id="btn-cam-side"
-            title="Side Profile View (Click again to switch East / West side)"
+            title="Góc nhìn cạnh bên bàn cờ"
           >
-            Side
+            Góc Nghiêng
           </button>
           <button
             className="hud-btn"
             id="btn-cam-wide"
-            title="Wide Cathedral View (Click again to switch North Rose / South Narthex)"
+            title="Toàn cảnh sân vườn &amp; phòng khách"
           >
-            Cathedral
+            Sân Vườn &amp; Phòng
           </button>
 
           <div className="hud-divider" aria-hidden="true"></div>
-          <div className="mobile-sheet-section-label">Display &amp; Gestures</div>
+          <div className="mobile-sheet-section-label">Giao Diện</div>
 
           <button
             className="hud-btn"
             id="btn-hide-ui"
-            title="Toggle HUD visibility (Shortcut: H)"
+            title="Ẩn/hiện giao diện (Phím tắt: H)"
             onClick={() => setMobileSheetOpen(false)}
           >
-            Hide UI [H]
+            Ẩn Giao Diện [H]
           </button>
 
           <div className="mobile-sheet-hint">
-            <strong>Touch:</strong> Tap Piece to Move &nbsp;•&nbsp; 1-Finger Drag: Orbit &nbsp;•&nbsp; 2-Finger Drag: Pan &nbsp;•&nbsp; Pinch: Zoom
+            <strong>Cảm ứng:</strong> Chạm quân để chọn &nbsp;•&nbsp; 1 ngón: Xoay &nbsp;•&nbsp; 2 ngón: Trượt &nbsp;•&nbsp; Kẹp: Thu phóng
           </div>
         </div>
       </div>
 
       <div id="hud-bottom">
         <div className="hint-pill" id="controls-hint">
-          <strong>Controls:</strong> Click Piece to Move &nbsp;•&nbsp; Left-Drag: Orbit &nbsp;•&nbsp; Right-Drag: Pan &nbsp;•&nbsp; Scroll: Zoom &nbsp;•&nbsp; WASD + R/F: Fly Cam &nbsp;•&nbsp; H: Hide UI
+          <strong>Điều khiển:</strong> Nhấp quân cờ để di chuyển &nbsp;•&nbsp; Chuột trái: Xoay 360° &nbsp;•&nbsp; Chuột phải: Trượt góc nhìn &nbsp;•&nbsp; Cuộn: Thu phóng &nbsp;•&nbsp; H: Ẩn/Hiện giao diện
         </div>
         <div className="captured-pill" id="captured-tray"></div>
       </div>
